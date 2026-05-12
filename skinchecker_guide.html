@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>skinchecker 構築＆起動ガイド完全版</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI&family=Hiragino+Kaku+Gothic+ProN&family=Meiryo&display=swap');
+        
+        body { font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; line-height: 1.6; color: #333; background-color: #f0f4f8; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 30px auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 25px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #7f8c8d; font-size: 0.95em; margin-bottom: 30px; }
+        .alert { background: #fff3cd; border-left: 5px solid #ffca28; padding: 15px; margin: 20px 0; border-radius: 4px; font-size: 0.95em; }
+        .info-box { background: #e3f2fd; border-left: 5px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; font-size: 0.95em; }
+        
+        /* タブ切り替えのスタイル */
+        .tab-group { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .tab-btn { padding: 12px 25px; border: none; background: #e1e8ed; color: #7f8c8d; font-weight: bold; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 1.05em; transition: 0.2s; }
+        .tab-btn.active { background: #3498db; color: white; }
+        
+        /* セクション分け */
+        .section { margin-bottom: 40px; padding: 20px; border: 1px solid #e1e8ed; border-radius: 10px; background: #ffffff; }
+        .section-title { font-weight: bold; font-size: 1.2em; margin-bottom: 20px; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
+        
+        /* ボタン */
+        .btn-group { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 1em; flex: 1; min-width: 200px; }
+        .btn-blue { background: #3498db; color: white; }
+        .btn-orange { background: #e67e22; color: white; }
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+        .btn-group .btn.active { outline: 3px solid #333; outline-offset: 2px; }
+
+        /* コマンドボックス */
+        .cmd-box { font-family: 'Consolas', monospace; font-size: 0.95em; padding: 15px; border-radius: 6px; margin: 10px 0; overflow-x: auto; position: relative; }
+        .ps { background: #012456; color: #fff; border-left: 6px solid #00a2ed; } /* PowerShell */
+        .ubuntu { background: #2c001e; color: #fff; border-left: 6px solid #e95420; } /* Ubuntu */
+        .cmd-label { font-size: 0.7em; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; opacity: 0.7; letter-spacing: 1px; }
+
+        .hidden { display: none; }
+        .img-note { font-size: 0.85em; color: #e67e22; font-weight: bold; margin-top: 5px; }
+        code { background: #f1f1f1; padding: 2px 5px; border-radius: 3px; color: #e74c3c; font-family: Consolas, monospace; font-size: 0.95em; }
+        .qa-footer { background: #f8f9fa; border: 2px dashed #3498db; padding: 20px; border-radius: 10px; text-align: center; margin-top: 50px; }
+
+        /* 検索テーブル用追加スタイル */
+        .search-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.95em; }
+        .search-table th, .search-table td { border: 1px solid #e1e8ed; padding: 12px; text-align: left; }
+        .search-table th { background: #f8f9fa; color: #2c3e50; width: 30%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>skinchecker 構築＆起動ガイド</h1>
+    <div class="subtitle">ゼミ班員向けマニュアル (自動IP追従・逆引き検索付き)</div>
+
+    <div class="tab-group">
+        <button class="tab-btn active" onclick="switchMainTab('setup')">🚀 1. 最初の1回だけの準備（初期設定）</button>
+        <button class="tab-btn" onclick="switchMainTab('daily')">🔁 2. 二回目以降の「毎回の起動手順」</button>
+        <button class="tab-btn" onclick="switchMainTab('tools')">🔍 3. 開発お役立ち ＆ 別件メモ</button>
+    </div>
+
+    <div id="main-setup">
+        <div class="section">
+            <div class="section-title">🔍 Ollamaの確認</div>
+            <p>まず、Windowsの <strong>PowerShell（青い画面）</strong> を開き、Ollamaが動くかバージョン確認をします。</p>
+            <p>※まだ入れていない人は、先に <a href="https://ollama.com/" target="_blank">Ollama公式サイト</a> からWindows版をインストールしておいてください。</p>
+            <div class="cmd-box ps">
+                <div class="cmd-label">Windows PowerShell</div>
+                ollama --version
+            </div>
+            <p>正常なら <code>ollama version is 0.1.xx</code> と表示されます。確認できたら次へ進みます。</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🛠️ 動作モードの選択（どちらか選んでクリック）</div>
+            <p>PCのスペックや目的に合わせて、どちらかのボタンを押してください：</p>
+            <div class="btn-group">
+                <button class="btn btn-blue" onclick="showModel('light')">【推奨】軽量版 (2b) ルート<br><small>サクサク動く・低スペックPCでも安心</small></button>
+                <button class="btn btn-orange" onclick="showModel('high')">【高品質】本物 (7b) ルート<br><small>診断が緻密・メモリ32GB以上推奨</small></button>
+            </div>
+        </div>
+
+        <div id="method-detail" class="hidden section" style="background-color: #fafafa;">
+            <div id="method-light" class="hidden">
+                <div class="section-title">✨ 軽量版 (2b) の設定手順</div>
+                <div class="alert" style="background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24;">
+                    <strong>⚠️ 注意（自己責任ルート）：</strong><br>
+                    この軽量版は、低スペックPCでも動くように、本来の仕様（7b）とは異なる軽いモデル（2b）をダウンロードし、プログラム側の指定名である <code>gemma4:e2b</code> という名前に<strong>無理やり名前を偽装して</strong>認識させているカスタムルートです。<br>
+                    そのため、診断の精度が大幅に落ちたり、時々おかしな日本語を出力することがあります。動作の軽さを最優先した「自己責任モード」として使用してください。
+                </div>
+                <p><strong>PowerShell（青い画面）</strong> で実行してください：</p>
+                <div class="cmd-box ps">
+                    <div class="cmd-label">Windows PowerShell</div>
+                    ollama pull gemma:2b<br>
+                    "FROM gemma:2b" | Set-Content Modelfile<br>
+                    ollama create gemma4:e2b -f ./Modelfile
+                </div>
+                <p><code>success</code> と出ればOKです。</p>
+            </div>
+
+            <div id="method-high" class="hidden">
+                <div class="section-title">💎 本物 (7b) の設定手順</div>
+                <div class="info-box" style="background: #fff3cd; border-left: 5px solid #ffca28; color: #856404;">
+                    <strong>📢 グラフィックボードのスペックについて：</strong><br>
+                    本物のGemma（7b）を動かすには、PCに高いスペック（VRAM/メインメモリ）が要求されます。もし動かしてみてPCが極端に重くなったり、エラーが出る場合は、左の「軽量版ルート」へ切り替えてください。
+                </div>
+                <p><strong>PowerShell（青い画面）</strong> で実行してください：</p>
+                <div class="cmd-box ps">
+                    <div class="cmd-label">Windows PowerShell</div>
+                    ollama pull gemma4:e2b
+                </div>
+            </div>
+            <p style="margin-top: 20px;">設定が終わったら、初期設定はすべて完了です！2回目以降は、上のタブの「毎回の起動手順」だけをやればOKになります。</p>
+        </div>
+    </div>
+
+    <div id="main-daily" class="hidden">
+        <div class="alert">💡 <strong>【超重要】</strong> 学校から家に帰ったときなど、<strong>ネットワーク（Wi-Fi）の場所が変わったとき</strong>も、必ずこの手順を上から順番にやり直してください！</div>
+
+        <div class="section">
+            <div class="section-title">1️⃣ Windows側：Ollamaのホスト設定＆起動</div>
+            <p>外部（WSL2）からの接続を許可するため、Windowsの <strong>PowerShell（青い画面）</strong> で以下の2行を必ず実行してください。</p>
+            <div class="cmd-box ps">
+                <div class="cmd-label">Windows PowerShell</div>
+                $env:OLLAMA_HOST="0.0.0.0"<br>
+                ollama serve
+            </div>
+            <p>※ <code>Listening on [::]:11434</code> と出れば待機完了です。この画面は閉じずにそのままにしておきます。</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">2️⃣ Ubuntu側（画面1）：自動IP追従中継マシンの起動</div>
+            <p><strong>Ubuntu（黒い画面）</strong> を開き、以下のコマンドを実行します。Wi-Fiが変わったり再起動してWindowsのIPアドレスが勝手に変動しても、自動的に本物のIPを割り出して安全にリレーを回し続けます。</p>
+            <div class="cmd-box ubuntu">
+                <div class="cmd-label">Ubuntu Terminal (中継専用画面)</div>
+                sudo killall -9 socat 2>/dev/null<br>
+                while true; do socat TCP-LISTEN:11434,reuseaddr TCP:$(host -t A $(hostname).local | awk '/has address/ {print $4; exit}'):11434; done
+            </div>
+            <p class="img-note">⚠️ 注意：これを実行すると画面が静かに待機状態になります（次のコマンドが打てなくなります）。これで大正解です！この画面はこのまま放置してください。</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">3️⃣ Ubuntu側（画面2）：アプリの起動</div>
+            <p>タスクバーから<strong>「もう1つ新しくUbuntu（黒い画面）」</strong>を開きます。ソースコードのあるフォルダ（<code>~/skin/aiface</code>）に移動し、仮想環境に入って起動します。</p>
+            <div class="cmd-box ubuntu">
+                <div class="cmd-label">Ubuntu Terminal (アプリ起動画面)</div>
+                cd ~/skin/aiface<br>
+                source .venv/bin/activate<br>
+                python3 -m streamlit run skinchecker/app/streamlit_app.py
+            </div>
+            <div class="alert">
+                <strong>💡 仮想環境チェック</strong><br>
+                2行目を打ったあと、画面の左端に <code>(.venv)</code> という文字が出ていることを必ず確認してください！
+            </div>
+            <p>表示されたLocal URL（http://localhost:8501）をブラウザで開けば、家でも学校でも100%確実に肌診断が動き出します！</p>
+        </div>
+    </div>
+
+    <div id="main-tools" class="hidden">
+        <div class="section" style="border: 2px solid #9b59b6; background: #fffbfd;">
+            <div class="section-title" style="color: #8e44ad;">📁 【自分用メモ】別プロジェクト（顔UIビューアー）の起動手順</div>
+            <p>フォルダ <code>aiface260508-wsl2</code> 側で、画像を直接読み込んでUIビューアーを動かす時のコマンド一式です。</p>
+            <div class="cmd-box ubuntu" style="background: #1a0012; border-left: 6px solid #9b59b6;">
+                <div class="cmd-label">Ubuntu Terminal (aiface260508-wsl2用)</div>
+                # 1. フォルダ移動と仮想環境アクティベート<br>
+                cd ~/skin/aiface260508-wsl2<br>
+                source .venv/bin/activate<br><br>
+                # 2. PYTHONPATHを通してビューアーを実行（サンプル画像を読み込み）<br>
+                PYTHONPATH=src python3 src/aiface/ui/viewer.py -i samples/face.jpg
+            </div>
+            <span style="font-size: 0.85em; color: #666;">※ Streamlitの肌診断とはインポート経路やフォルダが異なるので、作業を戻す時はこのコマンドをそのまま使用すること。</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🔍 ファイル・コード内テキストの爆速検索</div>
+            <p>「あのソースコードどこに置いたっけ？」「特定の関数を使っているファイルを探したい」という時に使える超便利コマンドです。</p>
+            
+            <table class="search-table">
+                <tr>
+                    <th>ファイル名で探す</th>
+                    <td>
+                        <div class="cmd-box ubuntu" style="margin:0;"><div class="cmd-label">Ubuntu</div>find . -name "app.py"</div>
+                        <span style="font-size:0.85em; color:#666;">現在地（.）以下から、ファイル名が完全に一致するものを検索。</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>特定の拡張子を全検索</th>
+                    <td>
+                        <div class="cmd-box ubuntu" style="margin:0;"><div class="cmd-label">Ubuntu</div>find . -name "*.py"</div>
+                        <span style="font-size:0.85em; color:#666;">現在地以下のすべてのPythonファイルをリストアップ。</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>💡 激重な .venv を無視して検索</th>
+                    <td>
+                        <div class="cmd-box ubuntu" style="margin:0;"><div class="cmd-label">Ubuntu</div>find . -path "*/.venv*" -prune -o -name "*.py" -print</div>
+                        <span style="font-size:0.85em; color:#666; font-weight:bold; color:#e67e22;">仮想環境の中の膨大な外部ライブラリを検索対象から除外し、自分が書いたファイルだけを爆速で見つけます！</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>コード内の文字を全検索</th>
+                    <td>
+                        <div class="cmd-box ubuntu" style="margin:0;"><div class="cmd-label">Ubuntu</div>grep -rn "OLLAMA_HOST" .</div>
+                        <span style="font-size:0.85em; color:#666;">現在地以下の全ファイルを対象に、指定した文字列を検索して行番号と一緒に表示。</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>.venv を無視して文字検索</th>
+                    <td>
+                        <div class="cmd-box ubuntu" style="margin:0;"><div class="cmd-label">Ubuntu</div>grep -rn --exclude-dir=.venv "import streamlit" .</div>
+                        <span style="font-size:0.85em; color:#666;">ライブラリのコードを無視して、自分のソースコードだけから文字を探せます。</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🧹 プロセスのお掃除（不具合リセット）</div>
+            <p>「なんか通信が詰まった」「中継をやり直したい」という時に、裏で暴走したプロセスを一括で黙らせるお掃除用コマンドです。</p>
+            <div class="cmd-box ubuntu">
+                <div class="cmd-label">Ubuntu Terminal</div>
+                # ゾンビ化した中継プロセスを全滅させる<br>
+                sudo killall -9 socat 2>/dev/null<br><br>
+                # 現在の画面の裏(&)で動いているジョブをすべて強制終了する<br>
+                kill -9 $(jobs -p) 2>/dev/null
+            </div>
+        </div>
+    </div>
+
+    <div class="qa-footer">
+        <h3>📩 お困りの際は（個別サポート・質問箱）</h3>
+        <p>
+            手順通りに進めても <code>(.venv)</code> が表示されない場合や、画面にエラーが出る場合など、<strong>口頭では少し聞きづらい際</strong>もこちらをご活用ください。<br>
+            不具合の原因を特定するため、フォームからは画面の赤文字だけでなく、<strong>UbuntuやPowerShellのログ（ターミナルのテキスト）</strong>も一緒にコピーして送っていただけますと幸いです。フォームの返答を忘れてそうな場合は大変申し訳ございませんが口頭で声かけてくれると助かります。
+        </p>
+        <br>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSc7shnGoqI4l4_WEPm2b10b8Bd_O-194F4bCPlKzLTauNOfxg/viewform?usp=header" target="_blank" class="btn btn-blue" style="text-decoration: none;">サポート用のフォームを開く</a>
+    </div>
+
+</div>
+
+<script>
+    // メインタブの切り替え
+    function switchMainTab(tabName) {
+        document.getElementById('main-setup').classList.add('hidden');
+        document.getElementById('main-daily').classList.add('hidden');
+        document.getElementById('main-tools').classList.add('hidden');
+        
+        document.getElementById('main-' + tabName).classList.remove('hidden');
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    // モデル選択時の表示切り替え
+    function showModel(mode) {
+        document.getElementById('method-detail').classList.remove('hidden');
+        document.getElementById('method-light').classList.add('hidden');
+        document.getElementById('method-high').classList.add('hidden');
+        document.getElementById('method-' + mode).classList.remove('hidden');
+
+        event.target.closest('.btn-group').querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        event.target.closest('.btn').classList.add('active');
+        
+        window.scrollBy({ top: 300, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
