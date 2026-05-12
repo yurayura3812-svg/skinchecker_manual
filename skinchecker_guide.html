@@ -52,8 +52,6 @@
 
 <div class="container">
     <h1>skinchecker 構築＆起動ガイド</h1>
-    <div class="subtitle">ゼミ班員向けマニュアル (自動IP追従・逆引き検索付き)</div>
-
     <div class="tab-group">
         <button class="tab-btn active" onclick="switchMainTab('setup')">🚀 1. 最初の1回だけの準備（初期設定）</button>
         <button class="tab-btn" onclick="switchMainTab('daily')">🔁 2. 二回目以降の「毎回の起動手順」</button>
@@ -173,8 +171,8 @@
         </div>
 
         <div class="section">
-            <div class="section-title">🔍 ファイル・コード内テキストの爆速検索</div>
-            <p>「あのソースコードどこに置いたっけ？」「特定の関数を使っているファイルを探したい」という時に使える超便利コマンドです。</p>
+            <div class="section-title">🔍 ファイル・コード内テキストの検索</div>
+            <p>「あのソースコードどこに置いたっけ？」「特定の関数を使っているファイルを探したい」という時に使えるコマンドです。</p>
             
             <table class="search-table">
                 <tr>
@@ -195,7 +193,7 @@
                     <th>💡 激重な .venv を無視して検索</th>
                     <td>
                         <div class="cmd-box ubuntu" style="margin:0;"><div class="cmd-label">Ubuntu</div>find . -path "*/.venv*" -prune -o -name "*.py" -print</div>
-                        <span style="font-size:0.85em; color:#666; font-weight:bold; color:#e67e22;">仮想環境の中の膨大な外部ライブラリを検索対象から除外し、自分が書いたファイルだけを爆速で見つけます！</span>
+                        <span style="font-size:0.85em; color:#666; font-weight:bold; color:#e67e22;">仮想環境の中の膨大な外部ライブラリを検索対象から除外し、自分が書いたファイルだけを見つけます！</span>
                     </td>
                 </tr>
                 <tr>
@@ -231,8 +229,10 @@
     <div class="qa-footer">
         <h3>📩 お困りの際は（個別サポート・質問箱）</h3>
         <p>
-            手順通りに進めても <code>(.venv)</code> が表示されない場合や、画面にエラーが出る場合など、<strong>口頭では少し聞きづらい際</strong>もこちらをご活用ください。<br>
-            不具合の原因を特定するため、フォームからは画面の赤文字だけでなく、<strong>UbuntuやPowerShellのログ（ターミナルのテキスト）</strong>も一緒にコピーして送っていただけますと幸いです。フォームの返答を忘れてそうな場合は大変申し訳ございませんが口頭で声かけてくれると助かります。
+            手順通りに進めても <code>(.venv)</code> が表示されない場合や、画面にエラーが出る際などにこちらをご活用ください。配慮の至らない点や書き損ねている部分も多々あるかと存じますので、お気づきの点がございましたらご指摘いただけますと幸いです。
+        </p>
+        <p>
+            不具合の原因を特定するため、フォームからは画面の赤文字だけでなく、<strong>UbuntuやPowerShellのログ（ターミナルのテキスト）</strong>も一緒にコピーして送っていただけますと幸いです。返答が滞っている（忘れていそうな）場合は、大変恐縮ですが口頭で直接お声がけいただけますと助かります。
         </p>
         <br>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSc7shnGoqI4l4_WEPm2b10b8Bd_O-194F4bCPlKzLTauNOfxg/viewform?usp=header" target="_blank" class="btn btn-blue" style="text-decoration: none;">サポート用のフォームを開く</a>
