@@ -52,6 +52,8 @@
 
 <div class="container">
     <h1>skinchecker 構築＆起動ガイド</h1>
+    <div class="subtitle">自動IP追従・逆引き検索付き</div>
+
     <div class="tab-group">
         <button class="tab-btn active" onclick="switchMainTab('setup')">🚀 1. 最初の1回だけの準備（初期設定）</button>
         <button class="tab-btn" onclick="switchMainTab('daily')">🔁 2. 二回目以降の「毎回の起動手順」</button>
@@ -60,7 +62,7 @@
 
     <div id="main-setup">
         <div class="section">
-            <div class="section-title">🔍 Ollamaの確認</div>
+            <div class="section-title">🔍 Step 0: Ollamaの確認</div>
             <p>まず、Windowsの <strong>PowerShell（青い画面）</strong> を開き、Ollamaが動くかバージョン確認をします。</p>
             <p>※まだ入れていない人は、先に <a href="https://ollama.com/" target="_blank">Ollama公式サイト</a> からWindows版をインストールしておいてください。</p>
             <div class="cmd-box ps">
@@ -71,7 +73,7 @@
         </div>
 
         <div class="section">
-            <div class="section-title">🛠️ 動作モードの選択（どちらか選んでクリック）</div>
+            <div class="section-title">🛠️ Step 1: Ollamaの動作モード選択（どちらか選んでクリック）</div>
             <p>PCのスペックや目的に合わせて、どちらかのボタンを押してください：</p>
             <div class="btn-group">
                 <button class="btn btn-blue" onclick="showModel('light')">【推奨】軽量版 (2b) ルート<br><small>サクサク動く・低スペックPCでも安心</small></button>
@@ -109,7 +111,31 @@
                     ollama pull gemma4:e2b
                 </div>
             </div>
-            <p style="margin-top: 20px;">設定が終わったら、初期設定はすべて完了です！2回目以降は、上のタブの「毎回の起動手順」だけをやればOKになります。</p>
+
+            <div class="section" style="margin-top: 30px; border-top: 1px dashed #ccc; padding-top: 20px;">
+                <div class="section-title">🐍 Step 2: 仮想環境の構築＆ライブラリのインストール</div>
+                <p>プログラムを動かすためのクリーンな Python 仮想環境を作成し、必要な外部ライブラリ（Streamlit, MediaPipe 等）を一括インストールします。<strong>Ubuntu（黒い画面）</strong>を開き、プロジェクトのフォルダに移動して実行してください：</p>
+                <div class="cmd-box ubuntu">
+                    <div class="cmd-label">Ubuntu Terminal</div>
+                    cd ~/skin/aiface<br>
+                    python3 -m venv .venv<br>
+                    source .venv/bin/activate<br>
+                    pip install --upgrade pip<br>
+                    pip install -r requirements.txt
+                </div>
+            </div>
+
+            <div class="section" style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 20px;">
+                <div class="section-title">📸 Step 3: 顔認識モデルのダウンロード</div>
+                <p>アプリのAI顔認識機能に必要な学習モデルファイルを配置します。<strong>Ubuntu（黒い画面）</strong>で仮想環境に入ったまま、以下のコマンドを続けて実行してください：</p>
+                <div class="cmd-box ubuntu">
+                    <div class="cmd-label">Ubuntu Terminal</div>
+                    mkdir -p models<br>
+                    curl -L -o models/face_landmarker.task https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
+                </div>
+            </div>
+
+            <p style="margin-top: 20px;">設定がすべて終わったら、初期設定は完了です！2回目以降は、上のタブの「毎回の起動手順」だけをやればOKになります。</p>
         </div>
     </div>
 
@@ -117,30 +143,35 @@
         <div class="alert">💡 <strong>【超重要】</strong> 学校から家に帰ったときなど、<strong>ネットワーク（Wi-Fi）の場所が変わったとき</strong>も、必ずこの手順を上から順番にやり直してください！</div>
 
         <div class="section">
-            <div class="section-title">1️⃣ Windows側：Ollamaのホスト設定＆起動</div>
-            <p>外部（WSL2）からの接続を許可するため、Windowsの <strong>PowerShell（青い画面）</strong> で以下の2行を必ず実行してください。</p>
+            <div class="section-title">1️⃣ Windows側：Ollamaの起動</div>
+            <p>Windowsの <strong>PowerShell（青い画面）</strong> で以下のコマンドを実行して、AIモデルを待機状態にします。</p>
             <div class="cmd-box ps">
                 <div class="cmd-label">Windows PowerShell</div>
-                $env:OLLAMA_HOST="0.0.0.0"<br>
                 ollama serve
             </div>
             <p>※ <code>Listening on [::]:11434</code> と出れば待機完了です。この画面は閉じずにそのままにしておきます。</p>
+
+            <div class="alert" style="background: #f8d7da; border-left: 5px solid #dc3545; color: #721c24; margin-top: 15px;">
+                <strong>⚠️ もし以下のエラーが出た場合：</strong><br>
+                <code>Error: listen tcp 0.0.0.0:11434: bind: Only one usage of each socket address...</code><br>
+                これは、Windowsの右下のタスクバー裏（時計の横の <code>^</code> マークの中）で、すでにバックグラウンドのOllama（ラマのアイコン）が自動起動しているために発生します。<br>
+                <strong>【対策】：</strong>タスクバーのラマのアイコンを<strong>右クリックして「Quit」で完全に終了</strong>させてから、もう一度上記のコマンドを実行してください。
+            </div>
         </div>
 
         <div class="section">
             <div class="section-title">2️⃣ Ubuntu側（画面1）：自動IP追従中継マシンの起動</div>
-            <p><strong>Ubuntu（黒い画面）</strong> を開き、以下のコマンドを実行します。Wi-Fiが変わったり再起動してWindowsのIPアドレスが勝手に変動しても、自動的に本物のIPを割り出して安全にリレーを回し続けます。</p>
+            <p><strong>Ubuntu（黒い画面）</strong> を開き、以下のコマンドを実行します。Wi-Fiが変わったり再起動してWindowsのIPアドレスが勝手に変動しても、ネットワークの命綱から自動的に本物のIPを割り出して安全にリレーを回し続けます。</p>
             <div class="cmd-box ubuntu">
                 <div class="cmd-label">Ubuntu Terminal (中継専用画面)</div>
-                sudo killall -9 socat 2>/dev/null<br>
-                while true; do socat TCP-LISTEN:11434,reuseaddr TCP:$(host -t A $(hostname).local | awk '/has address/ {print $4; exit}'):11434; done
+                while true; do WINDOWS_IP=$(ip route show | grep default | awk '{print $3}'); socat TCP-LISTEN:11434,reuseaddr TCP:$WINDOWS_IP:11434; sleep 1; done
             </div>
             <p class="img-note">⚠️ 注意：これを実行すると画面が静かに待機状態になります（次のコマンドが打てなくなります）。これで大正解です！この画面はこのまま放置してください。</p>
         </div>
 
         <div class="section">
             <div class="section-title">3️⃣ Ubuntu側（画面2）：アプリの起動</div>
-            <p>タスクバーから<strong>「もう1つ新しくUbuntu（黒い画面）」</strong>を開きます。ソースコードのあるフォルダ（<code>~/skin/aiface</code>）に移動し、仮想環境に入って起動します。</p>
+            <p>タスクバーから<strong>「もう1つ新しくUbuntu（黒い画面）」</strong>を開きます。ソースコードのあるフォルダに移動し、仮想環境に入って起動します。</p>
             <div class="cmd-box ubuntu">
                 <div class="cmd-label">Ubuntu Terminal (アプリ起動画面)</div>
                 cd ~/skin/aiface<br>
@@ -171,8 +202,8 @@
         </div>
 
         <div class="section">
-            <div class="section-title">🔍 ファイル・コード内テキストの検索</div>
-            <p>「あのソースコードどこに置いたっけ？」「特定の関数を使っているファイルを探したい」という時に使えるコマンドです。</p>
+            <div class="section-title">🔍 ファイル・コード内テキストの爆速検索</div>
+            <p>「あのソースコードどこに置いたっけ？」「特定の関数を使っているファイルを探したい」という時に使える超便利コマンドです。</p>
             
             <table class="search-table">
                 <tr>
@@ -193,7 +224,7 @@
                     <th>💡 激重な .venv を無視して検索</th>
                     <td>
                         <div class="cmd-box ubuntu" style="margin:0;"><div class="cmd-label">Ubuntu</div>find . -path "*/.venv*" -prune -o -name "*.py" -print</div>
-                        <span style="font-size:0.85em; color:#666; font-weight:bold; color:#e67e22;">仮想環境の中の膨大な外部ライブラリを検索対象から除外し、自分が書いたファイルだけを見つけます！</span>
+                        <span style="font-size:0.85em; color:#666; font-weight:bold; color:#e67e22;">仮想環境の中の膨大な外部ライブラリを検索対象から除外し、自分が書いたファイルだけを爆速で見つけます！</span>
                     </td>
                 </tr>
                 <tr>
@@ -218,8 +249,6 @@
             <p>「なんか通信が詰まった」「中継をやり直したい」という時に、裏で暴走したプロセスを一括で黙らせるお掃除用コマンドです。</p>
             <div class="cmd-box ubuntu">
                 <div class="cmd-label">Ubuntu Terminal</div>
-                # ゾンビ化した中継プロセスを全滅させる<br>
-                sudo killall -9 socat 2>/dev/null<br><br>
                 # 現在の画面の裏(&)で動いているジョブをすべて強制終了する<br>
                 kill -9 $(jobs -p) 2>/dev/null
             </div>
@@ -229,10 +258,10 @@
     <div class="qa-footer">
         <h3>📩 お困りの際は（個別サポート・質問箱）</h3>
         <p>
-            手順通りに進めても <code>(.venv)</code> が表示されない場合や、画面にエラーが出る際などにこちらをご活用ください。配慮の至らない点や書き損ねている部分も多々あるかと存じますので、お気づきの点がございましたらご指摘いただけますと幸いです。
+            手順通りに進めても <code>(.venv)</code> が表示されない場合や、画面にエラーが出る際などにこちらをご活用ください。マニュアルに配慮の至らない点や書き損ねている部分も多々あるかと存じますので、お気づきの点がございましたらご指摘いただけますと幸いです。
         </p>
         <p>
-            不具合の原因を特定するため、フォームからは画面の赤文字だけでなく、<strong>UbuntuやPowerShellのログ（ターミナルのテキスト）</strong>も一緒にコピーして送っていただけますと幸いです。返答が滞っている（忘れていそうな）場合は、大変恐縮ですが口頭で直接お声がけいただけますと助かります。
+            不具合の原因を特定するため、フォームからは画面の赤文字だけでなく、<strong>UbuntuやPowerShellのログ（ターミナルのテキスト）</strong>も一緒にコピーして送っていただけますと幸いです。万が一、返答が滞っている（忘れていそうな）場合は、大変恐縮ですが口頭で直接お声がけいただけますと助かります。
         </p>
         <br>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSc7shnGoqI4l4_WEPm2b10b8Bd_O-194F4bCPlKzLTauNOfxg/viewform?usp=header" target="_blank" class="btn btn-blue" style="text-decoration: none;">サポート用のフォームを開く</a>
